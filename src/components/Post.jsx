@@ -1,28 +1,47 @@
+import { format, formatDistanceToNow } from 'date-fns'
+import ptBR from 'date-fns/locale/pt-BR'
+
 import { Avatar } from './Avatar'
 import { Comment } from './Comment'
 
 import styles from './Post.module.css'
 
-export function Post() {
+export function Post({ author, publishedAt, content }) {
+    const publishedDateFormatted = format(new Date(publishedAt), "d 'de' LLLL 'ás' HH:mm'h'", {
+        locale: ptBR,
+    })
+
+    const publishedDateRelativeToNow = formatDistanceToNow(new Date(publishedAt), {
+        locale: ptBR,
+        addSuffix: true,
+    })
+
     return (
         <article className={styles.post}>
             <header>
                 <div className={styles.author}>
-                    <Avatar src={"https://github.com/clesarjr.png"} />
+                    <Avatar src={author.avatarUrl} hasBorder={false} />
                     <div className={styles.authorInfo}>
-                        <strong>Clésar Sapelli Junior</strong>
-                        <span>Web Developer</span>
+                        <strong>{author.name}</strong>
+                        <span>{author.role}</span>
                     </div>
                 </div>
 
-                <time title="16 de Novembro às 08:13h" dateTime="2023-16-11 08:13:30">Publicado há 1h</time>
+                <time title={publishedDateFormatted} dateTime={publishedAt.toISOString()}>
+                    {publishedDateRelativeToNow}
+                </time>
             </header>
 
             <div className={styles.content}>
-                <p>Olá</p>
-                <p>Teste projeto</p>
-                <p><a href="#">link</a></p>
-                <p><a href="#">#projeto</a></p>
+                {content.map(item => {
+                    if (item.type === 'paragraph') {
+                        return <p>{item.content}</p>
+                    }
+
+                    if (item.type === 'link') {
+                        return <p><a href="">{item.content}</a></p>
+                    }
+                })}
             </div>
 
             <form className={styles.commentForm}>
