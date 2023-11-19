@@ -1,20 +1,34 @@
 import { format, formatDistanceToNow } from 'date-fns'
 import ptBR from 'date-fns/locale/pt-BR'
+import styles from './Post.module.css'
+import { useState } from 'react'
 
 import { Avatar } from './Avatar'
 import { Comment } from './Comment'
 
-import styles from './Post.module.css'
-
 export function Post({ author, publishedAt, content }) {
+    const [comments, setComments] = useState(['Post muito bom!'])
+    const [newCommentText, setNewCommentText] = useState([''])
+
     const publishedDateFormatted = format(new Date(publishedAt), "d 'de' LLLL 'ás' HH:mm'h'", {
         locale: ptBR,
     })
-
     const publishedDateRelativeToNow = formatDistanceToNow(new Date(publishedAt), {
         locale: ptBR,
         addSuffix: true,
     })
+
+    function addComment() {
+        event.preventDefault();
+
+        const newComment = event.target.comment.value
+        setComments([...comments, newComment])
+        setNewCommentText('')
+    }
+
+    function newCommentChange() {
+        setNewCommentText(event.target.value)
+    }
 
     return (
         <article className={styles.post}>
@@ -35,29 +49,37 @@ export function Post({ author, publishedAt, content }) {
             <div className={styles.content}>
                 {content.map(item => {
                     if (item.type === 'paragraph') {
-                        return <p>{item.content}</p>
+                        return <p key={item.content}>{item.content}</p>
                     }
 
                     if (item.type === 'link') {
-                        return <p><a href="">{item.content}</a></p>
+                        return <p key={item.content}><a href="">{item.content}</a></p>
                     }
                 })}
             </div>
 
-            <form className={styles.commentForm}>
+            <form onSubmit={addComment} className={styles.commentForm}>
                 <strong>Deixe seu feedback</strong>
 
                 <textarea
-                    placeholder='Deixe um comentário'
+                    name="comment"
+                    placeholder="Deixe um comentário"
+                    value={newCommentText}
+                    onChange={newCommentChange}
                 />
 
                 <button type="submit">Publicar</button>
             </form>
 
             <div className={styles.commentList}>
-                <Comment />
-                <Comment />
-                <Comment />
+                {comments.map((comment, index) => {
+                    return (
+                        <Comment 
+                            key={index}
+                            content={comment}
+                        />
+                    )
+                })}
             </div>
         </article>
     )
