@@ -38,6 +38,8 @@ export function Post({ author, publishedAt, content }) {
         setNewCommentText(event.target.value)
     }
 
+    const isNewCommentEmpty = newCommentText.length === 0
+
     return (
         <article className={styles.post}>
             <header>
@@ -76,7 +78,9 @@ export function Post({ author, publishedAt, content }) {
                     onChange={newCommentChange}
                 />
 
-                <button type="submit">Publicar</button>
+                <button type="submit" disabled={isNewCommentEmpty}>
+                    Publicar
+                </button>
             </form>
 
             <div className={styles.commentList}>
